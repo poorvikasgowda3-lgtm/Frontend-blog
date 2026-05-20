@@ -1,0 +1,10 @@
+Role: Reader (General Public)
+Page: /feed (The main landing page showing articles)
+Component: <TopNavbar /> - Contains the logo and a "Write a Post" button.
+Component: <FeedContainer /> - The grid holding the articles. If you chose Track B, this component runs the GET request to your personalized feed algorithm.
+Component: <ArticleCard /> - A Shadcn Card showing the title, author, and tags. Crucial: If you chose Track B, clicking this card must silently fire your POST /api/interactions endpoint for the algorithm to learn!
+
+Role: Author (Content Creator)
+Page: /write (The publishing dashboard)
+Component: <TopNavbar /> - (Reused).
+Component: <PublishForm /> - A Shadcn Form with inputs for Title, Content, and a multi-select for Tags. Wired to POST /api/articles.
