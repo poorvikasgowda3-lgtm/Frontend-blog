@@ -2,7 +2,7 @@
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "./ui/card";
 import { Button } from "./ui/button";
-import { Eye } from "lucide-react";
+import { Eye, ArrowRight, Sparkles } from "lucide-react";
 
 interface ArticleProps {
   article: {
@@ -17,14 +17,13 @@ interface ArticleProps {
 export function ArticleCard({ article }: ArticleProps) {
   const handleClick = async () => {
     try {
-      // Fire the interaction endpoint silently
       await fetch("/api/interactions/views", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           article_id: article.article_id,
           duration_seconds: 15,
-          user_id: 1, // Mock user for demo purposes
+          user_id: 1, 
           device_type: "desktop"
         }),
       });
@@ -37,30 +36,39 @@ export function ArticleCard({ article }: ArticleProps) {
   return (
     <Card 
       onClick={handleClick} 
-      className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-card to-card/50 border-border/50 backdrop-blur-sm"
+      className="group cursor-pointer hover:shadow-2xl hover:shadow-cyan-500/10 transition-all duration-500 hover:-translate-y-2 bg-slate-900/80 border-slate-800/80 backdrop-blur-md overflow-hidden relative"
     >
-      <CardHeader>
-        <div className="flex justify-between items-start">
-          <CardTitle className="text-xl font-bold leading-tight">{article.title}</CardTitle>
-          <span className="text-xs text-muted-foreground bg-secondary px-2 py-1 rounded-full">
-            Author #{article.author_id}
+      <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-fuchsia-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-fuchsia-500 rounded-xl blur opacity-0 group-hover:opacity-20 transition duration-500" />
+
+      <CardHeader className="relative z-10 pb-2">
+        <div className="flex justify-between items-start mb-3">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20 flex items-center">
+            <Sparkles className="w-3 h-3 mr-1" /> Algorithm Pick
+          </span>
+          <span className="text-xs text-slate-500 font-medium bg-slate-800/50 px-2 py-1 rounded-md">
+            @{article.author_id}
           </span>
         </div>
-        <CardDescription className="line-clamp-2 mt-2 text-muted-foreground">
-          {article.summary || "No summary provided."}
-        </CardDescription>
+        <CardTitle className="text-2xl font-bold leading-snug group-hover:text-cyan-300 transition-colors duration-300 text-slate-100">
+          {article.title}
+        </CardTitle>
       </CardHeader>
-      <CardContent>
-        {/* Placeholder for tags if they existed */}
-        <div className="flex flex-wrap gap-2 mt-2">
-          <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-md font-medium">Contrarian</span>
+      <CardContent className="relative z-10">
+        <CardDescription className="line-clamp-3 text-slate-400 leading-relaxed text-sm">
+          {article.summary || "No summary provided. Read more to explore this contrarian viewpoint."}
+        </CardDescription>
+        <div className="flex flex-wrap gap-2 mt-4">
+          <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-1 rounded border border-slate-700 font-medium">Contrarian</span>
+          <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-1 rounded border border-slate-700 font-medium">Debate</span>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between items-center text-sm text-muted-foreground border-t border-border/50 pt-4">
-        <span>{new Date(article.published_at).toLocaleDateString()}</span>
-        <Button variant="ghost" size="sm" className="hover:bg-primary/20 hover:text-primary transition-colors">
-          <Eye className="w-4 h-4 mr-2" /> Read More
-        </Button>
+      <CardFooter className="relative z-10 flex justify-between items-center text-sm text-slate-500 border-t border-slate-800/60 pt-4 mt-2">
+        <span className="font-medium text-xs">{new Date(article.published_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+        <div className="flex items-center text-cyan-400 font-semibold group-hover:translate-x-1 transition-transform duration-300">
+          <span className="text-sm mr-1 opacity-0 group-hover:opacity-100 transition-opacity">Read</span>
+          <ArrowRight className="w-4 h-4" />
+        </div>
       </CardFooter>
     </Card>
   );
