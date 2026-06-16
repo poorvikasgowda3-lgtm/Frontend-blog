@@ -22,7 +22,7 @@ export function ArticleModal({ article, isOpen, onClose }: ArticleModalProps) {
       onClick={onClose}
     >
       <div 
-        className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl shadow-cyan-500/20"
+        className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl shadow-orange-500/20"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -38,9 +38,9 @@ export function ArticleModal({ article, isOpen, onClose }: ArticleModalProps) {
         <div className="p-8 md:p-12 space-y-6">
           {/* Header */}
           <div>
-            <div className="inline-block mb-4 px-3 py-1 rounded-full bg-gradient-to-r from-cyan-500/20 to-fuchsia-500/20 border border-cyan-500/30">
-              <span className="text-xs font-semibold uppercase tracking-wider text-cyan-400">
-                Contrarian Perspective
+            <div className="inline-block mb-4 px-3 py-1 rounded-full bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/30">
+              <span className="text-xs font-semibold uppercase tracking-wider text-orange-400">
+                Featured Story
               </span>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
@@ -66,7 +66,7 @@ export function ArticleModal({ article, isOpen, onClose }: ArticleModalProps) {
 
           {/* Summary Box */}
           {article.summary && (
-            <div className="p-6 bg-gradient-to-r from-cyan-500/10 to-fuchsia-500/10 border border-cyan-500/20 rounded-xl">
+            <div className="p-6 bg-gradient-to-r from-orange-500/10 to-pink-500/10 border border-orange-500/20 rounded-xl">
               <p className="text-lg text-slate-300 leading-relaxed">
                 {article.summary}
               </p>
@@ -76,7 +76,7 @@ export function ArticleModal({ article, isOpen, onClose }: ArticleModalProps) {
           {/* Content */}
           <div className="prose prose-invert max-w-none">
             <p className="text-base md:text-lg text-slate-300 leading-relaxed whitespace-pre-wrap">
-              {article.content || "Full article content not available."}
+              {article.content || "Full story content not available."}
             </p>
           </div>
 
@@ -99,7 +99,7 @@ export function ArticleModal({ article, isOpen, onClose }: ArticleModalProps) {
             </Button>
             <Button
               onClick={onClose}
-              className="ml-auto bg-gradient-to-r from-cyan-500 to-fuchsia-500 hover:opacity-90"
+              className="ml-auto bg-gradient-to-r from-orange-500 to-pink-500 hover:opacity-90"
             >
               Close
             </Button>

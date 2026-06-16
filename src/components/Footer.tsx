@@ -46,14 +46,14 @@ export function Footer() {
             <div className="flex gap-3">
               <a
                 href="#"
-                className="p-2 bg-slate-800 hover:bg-cyan-500/20 rounded-lg transition-colors text-slate-400 hover:text-cyan-400"
+                className="p-2 bg-slate-800 hover:bg-orange-500/20 rounded-lg transition-colors text-slate-400 hover:text-orange-400"
                 aria-label="Twitter"
               >
                 <Twitter className="w-4 h-4" />
               </a>
               <a
                 href="#"
-                className="p-2 bg-slate-800 hover:bg-fuchsia-500/20 rounded-lg transition-colors text-slate-400 hover:text-fuchsia-400"
+                className="p-2 bg-slate-800 hover:bg-pink-500/20 rounded-lg transition-colors text-slate-400 hover:text-pink-400"
                 aria-label="GitHub"
               >
                 <Github className="w-4 h-4" />
@@ -64,7 +64,7 @@ export function Footer() {
 
         {/* Bottom */}
         <div className="border-t border-slate-800/30 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-slate-400">
-          <p>&copy; {currentYear} Contrary Canvas. All rights reserved.</p>
+          <p>&copy; {currentYear} BLOG. All rights reserved.</p>
           <p>Made with ❤️ by Meet5 Team</p>
         </div>
       </div>
