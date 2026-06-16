@@ -1,0 +1,185 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Meet5 Backend API",
+    "version": "0.1.0",
+    "description": "API for the Meet5 frontend and published data."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Local development server"
+    }
+  ],
+  "paths": {
+    "/api/articles": {
+      "get": {
+        "summary": "List published articles",
+        "responses": {
+          "200": {
+            "description": "A list of published articles",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Article"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{userId}/feed/recommended": {
+      "get": {
+        "summary": "Get recommended feed for a user",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recommended feed response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "feed": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Article"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/articles/draft": {
+      "post": {
+        "summary": "Create a draft article",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "author_id": { "type": "integer" },
+                  "title": { "type": "string" },
+                  "summary": { "type": "string" },
+                  "content": { "type": "string" }
+                },
+                "required": ["author_id", "title", "content"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Draft article created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Article"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/articles/{articleId}/publish": {
+      "put": {
+        "summary": "Publish a draft article",
+        "parameters": [
+          {
+            "name": "articleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Article published",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Article"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/interactions/views": {
+      "post": {
+        "summary": "Record a view interaction",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "article_id": { "type": "integer" },
+                  "user_id": { "type": "integer" },
+                  "duration_seconds": { "type": "integer" },
+                  "device_type": { "type": "string" }
+                },
+                "required": ["article_id", "user_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Interaction recorded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "interaction_id": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Article": {
+        "type": "object",
+        "properties": {
+          "article_id": { "type": "integer" },
+          "author_id": { "type": "integer" },
+          "title": { "type": "string" },
+          "summary": { "type": "string" },
+          "published_at": { "type": "string", "format": "date-time" }
+        }
+      }
+    }
+  }
+}

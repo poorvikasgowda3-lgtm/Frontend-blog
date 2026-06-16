@@ -1,0 +1,10 @@
+Frontend Link: 
+
+Backend Link: 
+
+Database Proof: 
+
+Notes:
+- Frontend uses NEXT_PUBLIC_API_URL for production.
+- Backend uses DATABASE_URL from Supabase.
+- Do not commit any .env files or connection strings.

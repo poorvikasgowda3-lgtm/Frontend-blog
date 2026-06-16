@@ -33,4 +33,20 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
+### Production environment variable
+
+This frontend expects a separate backend service. Before you deploy on Vercel, add the environment variable:
+
+- `NEXT_PUBLIC_API_URL` = `https://your-backend.onrender.com`
+
+The app rewrites `/api/*` to that backend URL in production. Locally it defaults to `http://127.0.0.1:8000`.
+
+### Backend and database setup
+
+This repository also includes a backend scaffold in `backend/` and a Supabase schema dump in `database_dump.sql`.
+
+1. Deploy the backend service from `backend/` to Render or Railway.
+2. Set `DATABASE_URL` to your Supabase connection string.
+3. Deploy the frontend on Vercel with `NEXT_PUBLIC_API_URL`.
+
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

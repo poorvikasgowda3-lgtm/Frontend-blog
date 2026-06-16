@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: meet5-backend
+    env: node
+    branch: main
+    plan: starter
+    root: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        sync: false
