@@ -1,35 +1,46 @@
 import { TopNavbar } from "@/components/TopNavbar";
 import { FeedContainer } from "@/components/FeedContainer";
+import { Footer } from "@/components/Footer";
 
 export default function FeedPage() {
   return (
-    <div className="min-h-screen relative overflow-hidden bg-slate-950 selection:bg-fuchsia-500/30">
-      {/* Dynamic Background Gradients */}
-      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-blue-600/30 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-fuchsia-600/20 blur-[150px] pointer-events-none" />
-      <div className="absolute top-[30%] left-[40%] w-[400px] h-[400px] rounded-full bg-cyan-400/10 blur-[100px] pointer-events-none" />
+    <div className="flex flex-col min-h-screen relative overflow-hidden bg-slate-950 selection:bg-orange-500/30">
+      {/* Dynamic Background Gradients - Curved */}
+      <div className="absolute top-[-30%] left-[-10%] w-[600px] h-[600px] rounded-full bg-orange-600/20 blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-[-15%] right-[-5%] w-[700px] h-[700px] rounded-full bg-pink-600/15 blur-[160px] pointer-events-none" />
+      <div className="absolute top-[20%] left-[35%] w-[500px] h-[500px] rounded-full bg-rose-400/5 blur-[120px] pointer-events-none" />
+
+      {/* Curved decorative shapes */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-orange-500/30 to-transparent blur-md pointer-events-none" />
+      <div className="absolute top-24 left-0 right-0 h-px bg-gradient-to-r from-transparent via-pink-500/20 to-transparent blur-sm pointer-events-none" />
 
       <TopNavbar />
       
-      <main className="container relative z-10 mx-auto px-4 py-16">
+      <main className="container relative z-10 mx-auto px-4 py-16 flex-1">
         <div className="mb-16 text-center space-y-6">
-          <div className="inline-block mb-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-blue-500/20 to-fuchsia-500/20 border border-blue-500/30 backdrop-blur-md">
-            <span className="text-sm font-semibold uppercase tracking-wider text-blue-300">
-              Personalized for you
+          <div className="inline-block mb-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-orange-500/20 to-pink-500/20 border border-orange-500/30 backdrop-blur-md">
+            <span className="text-sm font-semibold uppercase tracking-wider text-orange-300">
+              Latest Stories
             </span>
           </div>
           <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-tight">
-            Your <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-fuchsia-500 bg-clip-text text-transparent drop-shadow-sm">Contrarian</span> Feed
+            Welcome to <span className="bg-gradient-to-r from-orange-400 via-pink-500 to-rose-500 bg-clip-text text-transparent drop-shadow-sm">BLOG</span>
           </h1>
           <p className="text-xl md:text-2xl text-slate-400 max-w-3xl mx-auto font-light">
-            Discover articles that challenge your perspective. The more you interact, the smarter the algorithm gets.
+            Discover amazing stories and articles shared by our community. Read, engage, and share your thoughts.
           </p>
         </div>
         
-        <div className="bg-slate-900/50 p-6 md:p-8 rounded-3xl border border-slate-800 backdrop-blur-xl shadow-2xl shadow-blue-900/20">
-          <FeedContainer />
+        <div className="bg-slate-900/50 p-6 md:p-8 rounded-3xl border border-slate-800 backdrop-blur-xl shadow-2xl shadow-orange-900/10 relative overflow-hidden">
+          {/* Curved accent inside */}
+          <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-gradient-to-bl from-orange-500/10 to-transparent blur-3xl pointer-events-none" />
+          <div className="relative z-10">
+            <FeedContainer />
+          </div>
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }

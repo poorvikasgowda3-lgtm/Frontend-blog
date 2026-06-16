@@ -1,0 +1,39 @@
+Frontend Link: https://your-project-name.vercel.app
+
+Backend Link (Swagger): https://your-api-name.onrender.com/docs
+
+Database Proof: (Attach a screenshot of Supabase connection string; blur the password)
+
+Checklist & Quick Steps
+
+1) Supabase (Postgres)
+- Create a new project on https://app.supabase.com
+- Open SQL Editor and run `database_dump.sql` (file: database_dump.sql)
+- In Settings > Database > Connection string, copy the FULL DATABASE_URL
+
+2) Backend (Render or Railway)
+- Connect your GitHub repo for `backend/`
+- In service Settings > Environment, add `DATABASE_URL` = <Supabase connection string>
+- Deploy the service and verify `https://<service>.onrender.com/docs` loads the Swagger UI
+
+3) Frontend (Vercel)
+- Connect your GitHub repo for the Next.js frontend
+- In Vercel Dashboard > Environment Variables, add `NEXT_PUBLIC_API_URL` = https://<your-backend>.onrender.com
+- Deploy the site and open the Vercel URL on a phone to verify data loads
+
+Submission Tips
+- NEVER commit `.env` files or secrets to GitHub
+- For the screenshot, blur/scribble out the password portion of the connection string
+- Paste the two final URLs above and attach the screenshot when submitting
+
+Commands you may run locally (optional)
+
+# Install frontend deps
+npm install
+# Build frontend
+npm run build
+# Start backend locally (if needed)
+npm --prefix backend start
+
+
+Prepared by: poorvikasgowda3@gmail.com

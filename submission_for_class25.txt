@@ -1,0 +1,22 @@
+Email: poorvikasgowda3@gmail.com
+Name: 
+
+FE LINK:
+https://your-project-name.vercel.app
+
+BE LINK (Swagger):
+https://your-api-name.onrender.com/docs
+
+DB STRING SCREENSHOT:
+Attach a screenshot file showing your Supabase connection string (blur the password). Suggested filename: supabase_connection.png
+
+Instructions:
+- Replace the two URLs above with your live Vercel and Render service links.
+- Upload the blurred screenshot as the single file in the submission form (max 10 MB).
+- Do NOT commit any `.env` or plaintext secrets to GitHub.
+
+Notes for grader:
+- Frontend should call backend via the environment variable `NEXT_PUBLIC_API_URL`.
+- Backend requires `DATABASE_URL` to be set to the Supabase connection string.
+
+Prepared by: poorvikasgowda3@gmail.com
