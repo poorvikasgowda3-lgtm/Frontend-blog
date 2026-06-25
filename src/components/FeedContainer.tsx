@@ -15,6 +15,7 @@ interface PaginationData {
 }
 
 export function FeedContainer() {
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "";
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +27,7 @@ export function FeedContainer() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/users/1/feed/recommended?page=${pageNum}&limit=${limit}`, {
+      const res = await fetch(`${API_BASE}/api/users/1/feed/recommended?page=${pageNum}&limit=${limit}`, {
         headers: { "Content-Type": "application/json" },
       });
       
@@ -46,7 +47,7 @@ export function FeedContainer() {
       
       // Try fallback
       try {
-        const fallbackRes = await fetch(`/api/articles?page=${pageNum}&limit=${limit}`);
+        const fallbackRes = await fetch(`${API_BASE}/api/articles?page=${pageNum}&limit=${limit}`);
         if (fallbackRes.ok) {
           const fallbackData = await fallbackRes.json();
           setArticles(fallbackData.data || fallbackData || []);

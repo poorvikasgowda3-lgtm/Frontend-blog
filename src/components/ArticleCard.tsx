@@ -12,12 +12,13 @@ interface ArticleProps {
 }
 
 export function ArticleCard({ article }: ArticleProps) {
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "";
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleClick = async () => {
     // Log interaction
     try {
-      await fetch("/api/interactions/views", {
+      await fetch(`${API_BASE}/api/interactions/views`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

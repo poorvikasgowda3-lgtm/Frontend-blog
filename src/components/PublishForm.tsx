@@ -9,6 +9,7 @@ import { Loader2, Send, AlertCircle, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export function PublishForm() {
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "";
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [summary, setSummary] = useState("");
@@ -48,7 +49,7 @@ export function PublishForm() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/articles/draft", {
+      const res = await fetch(`${API_BASE}/api/articles/draft`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -66,7 +67,7 @@ export function PublishForm() {
       const data = await res.json();
 
       // Publish the article
-      const publishRes = await fetch(`/api/articles/${data.article_id}/publish`, {
+      const publishRes = await fetch(`${API_BASE}/api/articles/${data.article_id}/publish`, {
         method: "PUT",
       });
 
