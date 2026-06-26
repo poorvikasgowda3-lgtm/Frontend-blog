@@ -6,6 +6,7 @@ import { Loader2, AlertCircle, RefreshCw, ChevronLeft, ChevronRight } from "luci
 import type { Article } from "@/lib/types";
 import { Button } from "./ui/button";
 import { FeedSkeletonLoader } from "./Skeleton";
+import { getLocalArticles } from "@/lib/localArticles";
 
 interface PaginationData {
   total: number;
@@ -79,24 +80,35 @@ export function FeedContainer() {
   const [pagination, setPagination] = useState<PaginationData | null>(null);
   const limit = 12;
 
+  const mergeWithLocal = (remote: Article[]): Article[] => {
+    const local = getLocalArticles();
+    const remoteIds = new Set(remote.map((a) => a.article_id));
+    const uniqueLocal = local.filter((a) => !remoteIds.has(a.article_id));
+    return [...uniqueLocal, ...remote];
+  };
+
   const fetchFeed = async (pageNum: number = 1) => {
     setLoading(true);
     setError(null);
     try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
       const res = await fetch(`${API_BASE}/api/users/1/feed/recommended?page=${pageNum}&limit=${limit}`, {
         headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
       });
-      
+      clearTimeout(timeout);
+
       if (!res.ok) {
         throw new Error(`Failed to fetch feed: ${res.status}`);
       }
-      
+
       const data = await res.json();
       const fetchedArticles = data.feed || data.data || [];
       if (fetchedArticles.length > 0) {
-        setArticles(fetchedArticles);
+        setArticles(mergeWithLocal(fetchedArticles));
       } else {
-        setArticles(MOCK_ARTICLES);
+        setArticles(mergeWithLocal(MOCK_ARTICLES));
       }
       if (data.pagination) {
         setPagination(data.pagination);
@@ -104,17 +116,22 @@ export function FeedContainer() {
       setPage(pageNum);
     } catch (err) {
       console.error("Failed to fetch feed:", err);
-      
+
       // Try fallback
       try {
-        const fallbackRes = await fetch(`${API_BASE}/api/articles?page=${pageNum}&limit=${limit}`);
+        const controller2 = new AbortController();
+        const timeout2 = setTimeout(() => controller2.abort(), 5000);
+        const fallbackRes = await fetch(`${API_BASE}/api/articles?page=${pageNum}&limit=${limit}`, {
+          signal: controller2.signal,
+        });
+        clearTimeout(timeout2);
         if (fallbackRes.ok) {
           const fallbackData = await fallbackRes.json();
           const fetchedArticles = fallbackData.data || fallbackData || [];
           if (fetchedArticles.length > 0) {
-            setArticles(fetchedArticles);
+            setArticles(mergeWithLocal(fetchedArticles));
           } else {
-            setArticles(MOCK_ARTICLES);
+            setArticles(mergeWithLocal(MOCK_ARTICLES));
           }
           if (fallbackData.pagination) {
             setPagination(fallbackData.pagination);
@@ -126,8 +143,8 @@ export function FeedContainer() {
         }
       } catch (fallbackErr) {
         console.error("Fallback also failed:", fallbackErr);
-        // Both failed, use mock data as fallback
-        setArticles(MOCK_ARTICLES);
+        // Both failed — show local + mock articles
+        setArticles(mergeWithLocal(MOCK_ARTICLES));
         setError(null);
       }
     } finally {
@@ -137,7 +154,9 @@ export function FeedContainer() {
 
   useEffect(() => {
     fetchFeed(1);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   if (loading && articles.length === 0) {
     return <FeedSkeletonLoader />;
