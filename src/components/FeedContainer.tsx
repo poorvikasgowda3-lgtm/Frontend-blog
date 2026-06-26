@@ -15,7 +15,10 @@ interface PaginationData {
 }
 
 export function FeedContainer() {
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "";
+  let API_BASE = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE || "";
+  if (API_BASE.endsWith("/")) {
+    API_BASE = API_BASE.slice(0, -1);
+  }
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

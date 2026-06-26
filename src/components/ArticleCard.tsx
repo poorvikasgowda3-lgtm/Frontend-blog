@@ -12,7 +12,10 @@ interface ArticleProps {
 }
 
 export function ArticleCard({ article }: ArticleProps) {
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "";
+  let API_BASE = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE || "";
+  if (API_BASE.endsWith("/")) {
+    API_BASE = API_BASE.slice(0, -1);
+  }
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleClick = async () => {
@@ -68,7 +71,7 @@ export function ArticleCard({ article }: ArticleProps) {
           </div>
         </CardContent>
         <CardFooter className="relative z-10 flex justify-between items-center text-sm text-slate-500 border-t border-slate-800/60 pt-4 mt-2">
-          <span className="font-medium text-xs">{new Date(article.published_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+          <span className="font-medium text-xs">{new Date(article.published_at || article.created_at || new Date().toISOString()).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
           <div className="flex items-center text-orange-400 font-semibold group-hover:translate-x-1 transition-transform duration-300">
             <span className="text-sm mr-1 opacity-0 group-hover:opacity-100 transition-opacity">Read</span>
             <ArrowRight className="w-4 h-4" />

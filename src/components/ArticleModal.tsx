@@ -54,7 +54,7 @@ export function ArticleModal({ article, isOpen, onClose }: ArticleModalProps) {
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
                 <span>
-                  {new Date(article.published_at).toLocaleDateString(undefined, {
+                  {new Date(article.published_at || article.created_at || new Date().toISOString()).toLocaleDateString(undefined, {
                     month: 'long',
                     day: 'numeric',
                     year: 'numeric'
