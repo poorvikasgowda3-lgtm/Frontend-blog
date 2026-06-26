@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "./ui/card";
 import { Button } from "./ui/button";
-import { Eye, ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import type { Article } from "@/lib/types";
 import { ArticleModal } from "./ArticleModal";
 
@@ -12,32 +12,31 @@ interface ArticleProps {
 }
 
 export function ArticleCard({ article }: ArticleProps) {
-  let API_BASE = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE || "";
-  if (API_BASE.endsWith("/")) {
-    API_BASE = API_BASE.slice(0, -1);
-  }
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleClick = async () => {
-    // Log interaction
-    try {
-      await fetch(`${API_BASE}/api/interactions/views`, {
+  const handleClick = () => {
+    // Open modal immediately — don't wait for backend
+    setIsModalOpen(true);
+
+    // Log interaction in the background (fire and forget)
+    const API_BASE = (process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE || "").replace(/\/$/, "");
+    if (API_BASE) {
+      const controller = new AbortController();
+      setTimeout(() => controller.abort(), 3000);
+      fetch(`${API_BASE}/api/interactions/views`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           article_id: article.article_id,
           duration_seconds: 15,
-          user_id: 1, 
-          device_type: "desktop"
+          user_id: 1,
+          device_type: "desktop",
         }),
-      });
-    } catch (err) {
-      console.error("Failed to log interaction", err);
+        signal: controller.signal,
+      }).catch(() => {/* silently ignore */});
     }
-    
-    // Open modal
-    setIsModalOpen(true);
   };
+
 
   return (
     <>
