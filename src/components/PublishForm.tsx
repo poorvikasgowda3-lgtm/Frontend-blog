@@ -60,6 +60,7 @@ export function PublishForm() {
           title: title.trim(),
           content: content.trim(),
           summary: summary.trim() || null,
+          status: "published",
         }),
       });
 
@@ -69,13 +70,15 @@ export function PublishForm() {
 
       const data = await res.json();
 
-      // Publish the article
-      const publishRes = await fetch(`${API_BASE}/api/articles/${data.article_id}/publish`, {
-        method: "PUT",
-      });
+      // Publish the article (fallback if backend didn't publish it directly)
+      if (data.status !== "published") {
+        const publishRes = await fetch(`${API_BASE}/api/articles/${data.article_id}/publish`, {
+          method: "PUT",
+        });
 
-      if (!publishRes.ok) {
-        throw new Error("Failed to publish article");
+        if (!publishRes.ok) {
+          throw new Error("Failed to publish article");
+        }
       }
 
       setSuccess(true);

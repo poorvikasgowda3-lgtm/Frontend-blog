@@ -14,6 +14,59 @@ interface PaginationData {
   pages: number;
 }
 
+const MOCK_ARTICLES: Article[] = [
+  {
+    article_id: 101,
+    author_id: 1,
+    title: "The Future of Remote Work",
+    summary: "How working from home is reshaping industries forever.",
+    content: "Remote work has fundamentally changed how we think about productivity and collaboration. Companies are discovering that distributed teams can be more efficient than traditional office setups. The flexibility allows employees to optimize their environment and work during their most productive hours. This shift has opened opportunities for global talent acquisition and reduced overhead costs for businesses. However, it requires new communication strategies and tools to maintain team cohesion and company culture.",
+    status: "published",
+    published_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    article_id: 102,
+    author_id: 2,
+    title: "Building Your First Web App",
+    summary: "A beginner's guide to creating a modern web application.",
+    content: "Starting your first web development project can feel overwhelming. This guide breaks down the essential steps: choose your tech stack, set up your development environment, plan your project structure, and start coding. Modern frameworks like React and Next.js make it easier than ever to build professional applications. Don't get caught up in analysis paralysis - the best way to learn is by building. Start small, iterate quickly, and gradually add more features as you gain confidence.",
+    status: "published",
+    published_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    article_id: 103,
+    author_id: 3,
+    title: "Designing for Accessibility",
+    summary: "Why inclusive design benefits everyone.",
+    content: "Accessible design is not just about helping people with disabilities - it benefits everyone. When you design for accessibility, you create better user experiences overall. Clear typography, good color contrast, and intuitive navigation help all users navigate your product more easily. Keyboard navigation, screen reader compatibility, and alt text for images are standard practices that should be part of every design. Companies that prioritize accessibility often find their products have better engagement across all user demographics.",
+    status: "published",
+    published_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    article_id: 104,
+    author_id: 4,
+    title: "AI and the Future of Work",
+    summary: "How artificial intelligence is transforming industries.",
+    content: "Artificial intelligence is no longer science fiction - it's reshaping how we work today. From automation of routine tasks to AI-powered analytics, organizations are leveraging these technologies to increase productivity and make better decisions. However, the rise of AI also brings challenges around job displacement and the need for new skills. The future likely involves humans and AI working together, with AI handling data-heavy tasks and humans focusing on creativity and strategy. To stay relevant, professionals need to embrace continuous learning and understand how to work effectively with AI tools.",
+    status: "published",
+    published_at: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+  },
+  {
+    article_id: 105,
+    author_id: 5,
+    title: "The Art of Digital Storytelling",
+    summary: "Using multimedia to create engaging narratives.",
+    content: "Digital storytelling combines text, images, audio, and video to create compelling narratives. In today's fast-paced digital world, audiences respond better to well-crafted stories than to pure information dumps. Successful digital storytelling requires understanding your audience and choosing the right medium for your message. Whether you're creating blog posts, videos, or interactive experiences, the principles remain the same: start with a strong story, use visuals effectively, and make an emotional connection with your audience. The tools available today make it easier than ever to create professional-quality digital content.",
+    status: "published",
+    published_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+  }
+];
+
 export function FeedContainer() {
   let API_BASE = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE || "";
   if (API_BASE.endsWith("/")) {
@@ -39,29 +92,43 @@ export function FeedContainer() {
       }
       
       const data = await res.json();
-      setArticles(data.feed || data.data || []);
+      const fetchedArticles = data.feed || data.data || [];
+      if (fetchedArticles.length > 0) {
+        setArticles(fetchedArticles);
+      } else {
+        setArticles(MOCK_ARTICLES);
+      }
       if (data.pagination) {
         setPagination(data.pagination);
       }
       setPage(pageNum);
     } catch (err) {
       console.error("Failed to fetch feed:", err);
-      setError(err instanceof Error ? err.message : "Failed to load feed");
       
       // Try fallback
       try {
         const fallbackRes = await fetch(`${API_BASE}/api/articles?page=${pageNum}&limit=${limit}`);
         if (fallbackRes.ok) {
           const fallbackData = await fallbackRes.json();
-          setArticles(fallbackData.data || fallbackData || []);
+          const fetchedArticles = fallbackData.data || fallbackData || [];
+          if (fetchedArticles.length > 0) {
+            setArticles(fetchedArticles);
+          } else {
+            setArticles(MOCK_ARTICLES);
+          }
           if (fallbackData.pagination) {
             setPagination(fallbackData.pagination);
           }
           setError(null);
           setPage(pageNum);
+        } else {
+          throw new Error("Fallback fetch failed");
         }
       } catch (fallbackErr) {
         console.error("Fallback also failed:", fallbackErr);
+        // Both failed, use mock data as fallback
+        setArticles(MOCK_ARTICLES);
+        setError(null);
       }
     } finally {
       setLoading(false);

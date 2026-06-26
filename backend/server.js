@@ -109,9 +109,9 @@ app.get("/api/users/:userId/feed/recommended", asyncHandler(async (req, res) => 
   });
 }));
 
-// POST create a new draft article
+// POST create a new draft or published article
 app.post("/api/articles/draft", asyncHandler(async (req, res) => {
-  const { author_id, title, content, summary } = req.body;
+  const { author_id, title, content, summary, status } = req.body;
 
   // Validation
   if (!author_id) {
@@ -127,11 +127,15 @@ app.post("/api/articles/draft", asyncHandler(async (req, res) => {
     return res.status(400).json({ error: "title must be less than 255 characters" });
   }
 
+  const isPublished = status === "published";
+  const articleStatus = isPublished ? "published" : "draft";
+  const publishedAt = isPublished ? new Date() : null;
+
   const result = await pool.query(
-    `INSERT INTO articles (author_id, title, summary, content, status, created_at)
-     VALUES ($1, $2, $3, $4, 'draft', now())
-     RETURNING article_id, author_id, title, summary, status, created_at`,
-    [author_id, title.trim(), summary ? summary.trim().substring(0, 500) : null, content.trim()]
+    `INSERT INTO articles (author_id, title, summary, content, status, published_at, created_at)
+     VALUES ($1, $2, $3, $4, $5, $6, now())
+     RETURNING article_id, author_id, title, summary, status, published_at, created_at`,
+    [author_id, title.trim(), summary ? summary.trim().substring(0, 500) : null, content.trim(), articleStatus, publishedAt]
   );
   res.status(201).json(result.rows[0]);
 }));
