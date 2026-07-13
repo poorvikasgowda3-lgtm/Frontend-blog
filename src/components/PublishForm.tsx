@@ -9,6 +9,7 @@ import { Loader2, Send, AlertCircle, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { saveLocalArticle } from "@/lib/localArticles";
 import type { Article } from "@/lib/types";
+import { useAuth } from "@/lib/auth-context";
 
 export function PublishForm() {
   const [title, setTitle] = useState("");
@@ -17,6 +18,7 @@ export function PublishForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const { user } = useAuth();
   const router = useRouter();
 
   const validateForm = (): boolean => {
@@ -50,50 +52,51 @@ export function PublishForm() {
     setLoading(true);
 
     try {
-      // Try backend first (non-blocking, fast timeout)
+      let savedArticleId = Date.now();
       let published = false;
       const API_BASE = (process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE || "").replace(/\/$/, "");
 
-      if (API_BASE) {
-        try {
-          const controller = new AbortController();
-          const timeout = setTimeout(() => controller.abort(), 5000);
-          const res = await fetch(`${API_BASE}/api/articles/draft`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              author_id: 1,
-              title: title.trim(),
-              content: content.trim(),
-              summary: summary.trim() || null,
-              status: "published",
-            }),
-            signal: controller.signal,
-          });
-          clearTimeout(timeout);
-          if (res.ok) {
-            const data = await res.json();
-            if (data.status !== "published") {
-              const pubController = new AbortController();
-              const pubTimeout = setTimeout(() => pubController.abort(), 5000);
-              await fetch(`${API_BASE}/api/articles/${data.article_id}/publish`, {
-                method: "PUT",
-                signal: pubController.signal,
-              });
-              clearTimeout(pubTimeout);
-            }
-            published = true;
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+        const res = await fetch(`${API_BASE}/api/articles/draft`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            author_id: user?.user_id || 1,
+            title: title.trim(),
+            content: content.trim(),
+            summary: summary.trim() || null,
+            status: "published",
+          }),
+          signal: controller.signal,
+        });
+        clearTimeout(timeout);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.article_id) {
+            savedArticleId = Number(data.article_id);
           }
-        } catch {
-          // Backend unavailable — fall through to local save
+          if (data.status !== "published") {
+            const pubController = new AbortController();
+            const pubTimeout = setTimeout(() => pubController.abort(), 5000);
+            await fetch(`${API_BASE}/api/articles/${data.article_id}/publish`, {
+              method: "PUT",
+              signal: pubController.signal,
+            });
+            clearTimeout(pubTimeout);
+          }
+          published = true;
         }
+      } catch (err) {
+        console.error("Backend publish failed, falling back to local-only:", err);
       }
 
       // Always save locally so article appears in feed immediately
       const now = new Date().toISOString();
       const localArticle: Article = {
-        article_id: Date.now(), // unique local ID
-        author_id: 1,
+        article_id: savedArticleId,
+        author_id: user?.user_id || 1,
         title: title.trim(),
         summary: summary.trim() || null,
         content: content.trim(),

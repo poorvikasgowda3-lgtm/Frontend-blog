@@ -7,6 +7,7 @@ import type { Article } from "@/lib/types";
 import { Button } from "./ui/button";
 import { FeedSkeletonLoader } from "./Skeleton";
 import { MOCK_ARTICLES, getAllArticles } from "@/lib/articles";
+import { useAuth } from "@/lib/auth-context";
 
 interface PaginationData {
   total: number;
@@ -28,6 +29,8 @@ export function FeedContainer() {
   const [pagination, setPagination] = useState<PaginationData | null>(null);
   const limit = 12;
 
+  const { user } = useAuth();
+
   const mergeWithLocal = (remote: Article[]): Article[] => {
     const remoteIds = new Set(remote.map((a) => a.article_id));
     const allLocal = getAllArticles().filter((a) => !remoteIds.has(a.article_id));
@@ -40,7 +43,8 @@ export function FeedContainer() {
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 5000);
-      const res = await fetch(`${API_BASE}/api/users/1/feed/recommended?page=${pageNum}&limit=${limit}`, {
+      const userId = user?.user_id || 1;
+      const res = await fetch(`${API_BASE}/api/users/${userId}/feed/recommended?page=${pageNum}&limit=${limit}`, {
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,
       });

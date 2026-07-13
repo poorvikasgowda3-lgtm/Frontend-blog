@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "./ui/card";
 import { ArrowRight, Sparkles } from "lucide-react";
 import type { Article } from "@/lib/types";
+import { useAuth } from "@/lib/auth-context";
 
 interface ArticleProps {
   article: Article;
@@ -12,27 +13,32 @@ interface ArticleProps {
 export function ArticleCard({ article }: ArticleProps) {
   const router = useRouter();
 
+  const { user } = useAuth();
+
   const handleClick = () => {
     // Navigate to separate article page instantly
     router.push(`/article/${article.article_id}`);
 
     // Log interaction in background (fire and forget)
     const API_BASE = (process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE || "").replace(/\/$/, "");
-    if (API_BASE) {
-      const controller = new AbortController();
-      setTimeout(() => controller.abort(), 3000);
-      fetch(`${API_BASE}/api/interactions/views`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          article_id: article.article_id,
-          duration_seconds: 15,
-          user_id: 1,
-          device_type: "desktop",
-        }),
-        signal: controller.signal,
-      }).catch(() => {/* silently ignore */});
-    }
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
+    fetch(`${API_BASE}/api/interactions/views`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        article_id: article.article_id,
+        duration_seconds: 15,
+        user_id: user?.user_id || 1,
+        device_type: "desktop",
+      }),
+      signal: controller.signal,
+    })
+      .then(() => clearTimeout(timeout))
+      .catch(() => {
+        clearTimeout(timeout);
+        /* silently ignore */
+      });
   };
 
   return (

@@ -24,14 +24,19 @@ export default function ArticlePage() {
 
     // Try backend
     const API_BASE = (process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE || "").replace(/\/$/, "");
-    if (!API_BASE) { setNotFound(true); return; }
 
     const controller = new AbortController();
-    setTimeout(() => controller.abort(), 5000);
+    const timeout = setTimeout(() => controller.abort(), 5000);
     fetch(`${API_BASE}/api/articles/${id}`, { signal: controller.signal })
       .then((r) => (r.ok ? r.json() : null))
-      .then((data) => { if (data) setArticle(data); else setNotFound(true); })
-      .catch(() => setNotFound(true));
+      .then((data) => {
+        clearTimeout(timeout);
+        if (data) setArticle(data); else setNotFound(true);
+      })
+      .catch(() => {
+        clearTimeout(timeout);
+        setNotFound(true);
+      });
   }, [params?.id]);
 
   const handleShare = () => {

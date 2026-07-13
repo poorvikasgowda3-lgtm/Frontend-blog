@@ -32,6 +32,36 @@
         }
       }
     },
+    "/api/articles/{articleId}": {
+      "get": {
+        "summary": "Get article by ID",
+        "parameters": [
+          {
+            "name": "articleId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Article details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Article"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Article not found"
+          }
+        }
+      }
+    },
     "/api/users/{userId}/feed/recommended": {
       "get": {
         "summary": "Get recommended feed for a user",
@@ -166,6 +196,68 @@
           }
         }
       }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Authenticate or register a user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string" },
+                  "display_name": { "type": "string" }
+                },
+                "required": ["username"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "User created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users": {
+      "get": {
+        "summary": "List all registered users",
+        "responses": {
+          "200": {
+            "description": "List of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -177,7 +269,17 @@
           "author_id": { "type": "integer" },
           "title": { "type": "string" },
           "summary": { "type": "string" },
+          "content": { "type": "string" },
           "published_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "user_id": { "type": "integer" },
+          "username": { "type": "string" },
+          "display_name": { "type": "string" },
+          "avatar_url": { "type": "string", "nullable": true }
         }
       }
     }

@@ -74,6 +74,28 @@ app.get("/api/articles", asyncHandler(async (req, res) => {
   });
 }));
 
+// GET a single article by ID
+app.get("/api/articles/:articleId", asyncHandler(async (req, res) => {
+  const { articleId } = req.params;
+
+  if (!articleId || isNaN(articleId)) {
+    return res.status(400).json({ error: "Invalid article ID" });
+  }
+
+  const result = await pool.query(
+    `SELECT article_id, author_id, title, summary, content, status, published_at, created_at
+     FROM articles
+     WHERE article_id = $1`,
+    [articleId]
+  );
+
+  if (result.rowCount === 0) {
+    return res.status(404).json({ error: "Article not found" });
+  }
+
+  res.json(result.rows[0]);
+}));
+
 // GET recommended feed for a user with pagination
 app.get("/api/users/:userId/feed/recommended", asyncHandler(async (req, res) => {
   const { userId } = req.params;
@@ -182,6 +204,42 @@ app.post("/api/interactions/views", asyncHandler(async (req, res) => {
     [article_id, user_id, duration_seconds || 0, device_type || null]
   );
   res.status(201).json(result.rows[0]);
+}));
+
+// POST login or create user
+app.post("/api/auth/login", asyncHandler(async (req, res) => {
+  const { username, display_name } = req.body;
+
+  if (!username || typeof username !== "string" || username.trim().length === 0) {
+    return res.status(400).json({ error: "username is required" });
+  }
+
+  const cleanUsername = username.trim().toLowerCase();
+  
+  // Try to find the user
+  let userResult = await pool.query(
+    "SELECT user_id, username, display_name, avatar_url FROM users WHERE LOWER(username) = $1",
+    [cleanUsername]
+  );
+
+  if (userResult.rowCount > 0) {
+    return res.json(userResult.rows[0]);
+  }
+
+  // Create new user if not found
+  const displayName = display_name ? display_name.trim() : username.trim();
+  const insertResult = await pool.query(
+    "INSERT INTO users (username, display_name, avatar_url) VALUES ($1, $2, null) RETURNING user_id, username, display_name, avatar_url",
+    [cleanUsername, displayName]
+  );
+  
+  res.status(201).json(insertResult.rows[0]);
+}));
+
+// GET all users
+app.get("/api/users", asyncHandler(async (req, res) => {
+  const result = await pool.query("SELECT user_id, username, display_name, avatar_url FROM users ORDER BY user_id ASC");
+  res.json(result.rows);
 }));
 
 // Global error handler
