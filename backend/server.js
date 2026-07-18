@@ -28,6 +28,31 @@ const pool = new Pool({
   },
 });
 
+// Run database migrations on startup to add email and password if missing
+const migrateDb = async () => {
+  try {
+    await pool.query(`
+      ALTER TABLE users 
+      ADD COLUMN IF NOT EXISTS email text,
+      ADD COLUMN IF NOT EXISTS password text;
+    `);
+    
+    // Seed default credentials for default users if they don't have them
+    await pool.query(`
+      UPDATE users SET email = 'sarah@meet5.com', password = 'password123' WHERE username = 'sarah_writer' AND email IS NULL;
+      UPDATE users SET email = 'john@meet5.com', password = 'password123' WHERE username = 'john_dev' AND email IS NULL;
+      UPDATE users SET email = 'emma@meet5.com', password = 'password123' WHERE username = 'emma_design' AND email IS NULL;
+      UPDATE users SET email = 'alex@meet5.com', password = 'password123' WHERE username = 'alex_tech' AND email IS NULL;
+      UPDATE users SET email = 'mike@meet5.com', password = 'password123' WHERE username = 'mike_creator' AND email IS NULL;
+    `);
+    
+    console.log("✓ Database migrations and default seed users completed successfully.");
+  } catch (err) {
+    console.error("Migration error:", err);
+  }
+};
+migrateDb();
+
 app.use(cors());
 app.use(express.json());
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -208,29 +233,50 @@ app.post("/api/interactions/views", asyncHandler(async (req, res) => {
 
 // POST login or create user
 app.post("/api/auth/login", asyncHandler(async (req, res) => {
-  const { username, display_name } = req.body;
+  const { email, password } = req.body;
 
-  if (!username || typeof username !== "string" || username.trim().length === 0) {
-    return res.status(400).json({ error: "username is required" });
+  if (!email || typeof email !== "string" || !email.includes("@")) {
+    return res.status(400).json({ error: "A valid email is required" });
+  }
+  if (!password || typeof password !== "string" || password.length < 6) {
+    return res.status(400).json({ error: "Password must be at least 6 characters" });
   }
 
-  const cleanUsername = username.trim().toLowerCase();
+  const cleanEmail = email.trim().toLowerCase();
   
-  // Try to find the user
+  // Try to find the user by email
   let userResult = await pool.query(
-    "SELECT user_id, username, display_name, avatar_url FROM users WHERE LOWER(username) = $1",
-    [cleanUsername]
+    "SELECT user_id, username, display_name, email, avatar_url, password FROM users WHERE LOWER(email) = $1",
+    [cleanEmail]
   );
 
   if (userResult.rowCount > 0) {
-    return res.json(userResult.rows[0]);
+    const user = userResult.rows[0];
+    if (user.password !== password) {
+      return res.status(401).json({ error: "Invalid password" });
+    }
+    // Don't return password to client
+    delete user.password;
+    return res.json(user);
   }
 
-  // Create new user if not found
-  const displayName = display_name ? display_name.trim() : username.trim();
+  // Create new user if not found (auto-register)
+  const emailPrefix = cleanEmail.split("@")[0];
+  let username = emailPrefix;
+  let checks = 0;
+  while (true) {
+    const existing = await pool.query("SELECT 1 FROM users WHERE username = $1", [username]);
+    if (existing.rowCount === 0) break;
+    checks++;
+    username = `${emailPrefix}${checks}`;
+  }
+
+  const displayName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
   const insertResult = await pool.query(
-    "INSERT INTO users (username, display_name, avatar_url) VALUES ($1, $2, null) RETURNING user_id, username, display_name, avatar_url",
-    [cleanUsername, displayName]
+    `INSERT INTO users (username, display_name, email, password, avatar_url)
+     VALUES ($1, $2, $3, $4, null)
+     RETURNING user_id, username, display_name, email, avatar_url`,
+    [username, displayName, cleanEmail, password]
   );
   
   res.status(201).json(insertResult.rows[0]);
