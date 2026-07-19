@@ -17,6 +17,7 @@ export interface User {
   user_id: number;
   username: string;
   display_name: string;
+  email?: string | null;
   avatar_url?: string | null;
 }
 

@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { LogIn, Sparkles, Loader2, AlertCircle, ArrowRight, Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { fetchWithTimeout, getApiBase } from "@/lib/api";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -16,6 +15,8 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const API_BASE = (process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE || "").replace(/\/$/, "");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,16 +34,16 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetchWithTimeout(`${getApiBase()}/api/auth/login`, {
+      const res = await fetch(`${API_BASE}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: email.trim(),
           password: password,
         }),
-      }, 8000);
+      });
 
-      const data = await res.json().catch(() => ({}));
+      const data = await res.json();
 
       if (!res.ok) {
         throw new Error(data.error || "Login failed");
@@ -51,6 +52,7 @@ export default function LoginPage() {
       login(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred");
+    } finally {
       setLoading(false);
     }
   };

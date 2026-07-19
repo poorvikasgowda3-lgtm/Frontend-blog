@@ -29,9 +29,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!loading) {
       if (!user && pathname !== "/login") {
-        router.replace("/login");
+        router.push("/login");
       } else if (user && pathname === "/login") {
-        router.replace("/feed");
+        router.push("/feed");
       }
     }
   }, [user, loading, pathname, router]);
@@ -39,18 +39,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = (newUser: User) => {
     setUser(newUser);
     setStoredUser(newUser);
-    router.replace("/feed");
+    router.push("/feed");
   };
 
   const logout = () => {
     setUser(null);
     setStoredUser(null);
-    router.replace("/login");
+    router.push("/login");
   };
 
   return (
     <AuthContext.Provider value={{ user, login, logout, loading }}>
-      {children}
+      {!loading ? children : (
+        <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-center space-y-4">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full blur-xl opacity-30 animate-pulse" />
+            <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin relative" />
+          </div>
+          <p className="text-slate-400 text-sm">Authenticating session...</p>
+        </div>
+      )}
     </AuthContext.Provider>
   );
 }
