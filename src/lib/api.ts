@@ -19,5 +19,35 @@ export async function fetchWithTimeout(
 }
 
 export function getApiBase(): string {
-  return (process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE || "").replace(/\/$/, "");
+  const configuredBase = (process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE || "").replace(/\/$/, "");
+  if (configuredBase) {
+    return configuredBase;
+  }
+
+  return process.env.NODE_ENV === "development" ? "http://127.0.0.1:8000" : "/api";
 }
+
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://localhost:5000/api',
+});
+
+// Add a request interceptor to attach the JWT token
+api.interceptors.request.use(
+  (config) => {
+    // In Next.js, localStorage is only available in the browser (client-side)
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+export default api;

@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useAuth } from "@/lib/auth-context";
+import { authenticateUser } from "@/lib/auth";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,8 +17,6 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const API_BASE = (process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE || "").replace(/\/$/, "");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,22 +34,8 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch(`${API_BASE}/api/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: email.trim(),
-          password: password,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Login failed");
-      }
-
-      login(data);
+      const user = await authenticateUser(email, password);
+      login(user);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred");
     } finally {
@@ -127,7 +113,7 @@ export default function LoginPage() {
                 <LogIn className="w-5 h-5 text-orange-400" /> Sign In
               </CardTitle>
               <CardDescription className="text-slate-400 text-sm">
-                Enter your email and password. New emails are automatically registered.
+                Enter your email and password to access your account.
               </CardDescription>
             </CardHeader>
             
@@ -207,6 +193,12 @@ export default function LoginPage() {
                   </>
                 )}
               </Button>
+              <div className="mt-4 text-center text-sm text-slate-400 w-full">
+                Don&apos;t have an account?{" "}
+                <Link href="/register" className="text-orange-400 hover:text-orange-300 font-medium transition-colors">
+                  Sign up
+                </Link>
+              </div>
             </CardFooter>
           </Card>
         </div>
