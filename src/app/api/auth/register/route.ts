@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   }
 
   const normalizedBase = backendUrl.replace(/\/$/, "");
-  const targetUrl = `${normalizedBase.endsWith("/api") ? normalizedBase : `${normalizedBase}/api`}/auth/login`;
+  const targetUrl = `${normalizedBase.endsWith("/api") ? normalizedBase : `${normalizedBase}/api`}/auth/register`;
   const body = await request.text();
 
   const response = await fetch(targetUrl, {

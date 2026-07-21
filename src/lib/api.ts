@@ -21,16 +21,16 @@ export async function fetchWithTimeout(
 export function getApiBase(): string {
   const configuredBase = (process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE || "").replace(/\/$/, "");
   if (configuredBase) {
-    return configuredBase;
+    return configuredBase.endsWith("/api") ? configuredBase : `${configuredBase}/api`;
   }
 
-  return process.env.NODE_ENV === "development" ? "http://127.0.0.1:8000" : "/api";
+  return process.env.NODE_ENV === "development" ? "http://127.0.0.1:5000/api" : "/api";
 }
 
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: getApiBase(),
 });
 
 // Add a request interceptor to attach the JWT token

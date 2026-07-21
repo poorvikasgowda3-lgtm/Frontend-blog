@@ -47,26 +47,47 @@ export const register = async (req, res) => {
   }
 };
 
-// @desc    Auth user & get token
+// @desc    Auth user & get token (Auto register if new)
 // @route   POST /api/auth/login
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    let user = await User.findOne({ email });
 
-    if (user && (await user.matchPassword(password))) {
-      res.json({
-        user: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-        },
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(401).json({ message: 'Invalid email or password' });
-    }
+    // If user exists, authenticate
+    if (user) {
+      if (await user.matchPassword(password)) {
+        return res.json({
+          user: {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+          },
+          token: generateToken(user._id),
+        });
+      } else {
+        return res.status(401).json({ message: 'Invalid password' });
+      }
+    } 
+    
+    // If user does not exist, auto-register
+    const defaultName = email.split('@')[0];
+    user = await User.create({
+      name: defaultName,
+      email,
+      password,
+    });
+
+    res.status(201).json({
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+      token: generateToken(user._id),
+    });
+
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }

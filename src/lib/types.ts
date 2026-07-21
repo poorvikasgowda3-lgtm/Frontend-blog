@@ -14,11 +14,13 @@ export interface Article {
 }
 
 export interface User {
-  user_id: number;
+  user_id: number | string;
   username: string;
   display_name: string;
   email?: string | null;
   avatar_url?: string | null;
+  _id?: string;
+  name?: string;
 }
 
 export interface Interaction {

@@ -25,10 +25,10 @@ export function TopNavbar() {
           {user && (
             <div className="flex items-center space-x-2 mr-2">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500/20 to-pink-500/20 border border-orange-500/30 flex items-center justify-center text-orange-400 text-xs font-bold shadow-inner">
-                {user.display_name.charAt(0).toUpperCase()}
+                {(user.display_name || user.username || "U").charAt(0).toUpperCase()}
               </div>
               <span className="text-xs font-semibold text-slate-300 max-w-[80px] sm:max-w-[120px] truncate hidden xs:inline">
-                {user.display_name}
+                {user.display_name || user.username || "User"}
               </span>
             </div>
           )}

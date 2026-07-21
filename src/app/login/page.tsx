@@ -69,36 +69,9 @@ export default function LoginPage() {
             Connect with fellow writers, explore recommended feeds, and share your favourite stories with the community.
           </p>
 
-          {/* Demo credentials helper */}
           <div className="mt-4 p-4 rounded-xl bg-slate-900/60 border border-slate-800/80 backdrop-blur-sm">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-orange-400 mb-3">
-              Demo Credentials
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {[
-                { name: "Sarah Chen", email: "sarah@meet5.com" },
-                { name: "John Developer", email: "john@meet5.com" },
-                { name: "Emma Designer", email: "emma@meet5.com" },
-                { name: "Alex Thompson", email: "alex@meet5.com" },
-              ].map((demo) => (
-                <button
-                  key={demo.email}
-                  type="button"
-                  onClick={() => { setEmail(demo.email); setPassword("password123"); setError(null); }}
-                  className="flex items-center gap-2.5 p-2.5 rounded-lg border border-slate-800/60 bg-slate-900/30 hover:bg-slate-800/50 hover:border-orange-500/30 text-left transition-all duration-200 group"
-                >
-                  <div className="w-8 h-8 rounded-md bg-gradient-to-br from-orange-500/20 to-pink-500/20 border border-orange-500/20 flex items-center justify-center text-orange-400 text-xs font-bold group-hover:from-orange-500 group-hover:to-pink-500 group-hover:text-white transition-all duration-200">
-                    {demo.name.charAt(0)}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-medium text-slate-300 truncate">{demo.name}</p>
-                    <p className="text-[10px] text-slate-500 truncate">{demo.email}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
-            <p className="text-[10px] text-slate-600 mt-2.5">
-              Password for all demo accounts: <code className="text-orange-400/70 bg-slate-800/50 px-1 py-0.5 rounded">password123</code>
+            <p className="text-sm text-slate-400">
+              Sign in with your email and password, or create a new account if you are joining for the first time.
             </p>
           </div>
         </div>

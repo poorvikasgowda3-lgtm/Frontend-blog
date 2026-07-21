@@ -56,6 +56,8 @@ export function PublishForm() {
       let published = false;
       const API_BASE = (process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE || "").replace(/\/$/, "");
 
+      const authorId = typeof user?.user_id === "number" ? user.user_id : 1;
+
       try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 5000);
@@ -63,7 +65,7 @@ export function PublishForm() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            author_id: user?.user_id || 1,
+            author_id: authorId,
             title: title.trim(),
             content: content.trim(),
             summary: summary.trim() || null,
@@ -96,7 +98,7 @@ export function PublishForm() {
       const now = new Date().toISOString();
       const localArticle: Article = {
         article_id: savedArticleId,
-        author_id: user?.user_id || 1,
+        author_id: authorId,
         title: title.trim(),
         summary: summary.trim() || null,
         content: content.trim(),

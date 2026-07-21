@@ -4,11 +4,27 @@ import api from "./api";
 const USER_STORAGE_KEY = "meet5_logged_in_user";
 const TOKEN_STORAGE_KEY = "token";
 
+function normalizeUser(payload: any): User {
+  const rawUser = payload?.user ?? payload;
+  const email = typeof rawUser?.email === "string" ? rawUser.email : "";
+  const name = rawUser?.name || rawUser?.display_name || rawUser?.username || email.split("@")[0] || "User";
+  const username = rawUser?.username || email.split("@")[0] || name.toLowerCase().replace(/\s+/g, "-");
+
+  return {
+    user_id: rawUser?._id ?? rawUser?.user_id ?? 0,
+    username,
+    display_name: name,
+    email,
+    _id: rawUser?._id,
+    name,
+  } as User;
+}
+
 export function getStoredUser(): User | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = localStorage.getItem(USER_STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as User) : null;
+    return raw ? normalizeUser(JSON.parse(raw)) : null;
   } catch {
     return null;
   }
@@ -36,13 +52,13 @@ export async function authenticateUser(email: string, password: string): Promise
       email: normalizedEmail,
       password,
     });
-    
+
     const { user, token } = response.data;
-    
+
     // Save JWT token in localStorage
     localStorage.setItem(TOKEN_STORAGE_KEY, token);
-    
-    return user as User;
+
+    return normalizeUser(user);
   } catch (error: any) {
     if (error.response && error.response.data.message) {
       throw new Error(error.response.data.message);
@@ -60,13 +76,13 @@ export async function registerUser(name: string, email: string, password: string
       email: normalizedEmail,
       password,
     });
-    
+
     const { user, token } = response.data;
-    
+
     // Save JWT token in localStorage
     localStorage.setItem(TOKEN_STORAGE_KEY, token);
-    
-    return user as User;
+
+    return normalizeUser(user);
   } catch (error: any) {
     if (error.response && error.response.data.message) {
       throw new Error(error.response.data.message);
